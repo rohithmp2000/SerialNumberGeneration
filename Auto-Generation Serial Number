@@ -4,13 +4,13 @@
 			@lastserial varchar(10);
 
 	SET @prefix = (select AssetSubClassAbbrev 
-				   FROM [Asset.SubClass] 
-				   WHERE ID = @SubAssetClassID);
+		       FROM [Asset.SubClass] 
+		       WHERE ID = @SubAssetClassID);
 	SET @lastserial = (SELECT top 1 [SerialNumber] 
-				       FROM [ArmsV2].[dbo].[Asset.Tag] 
-					   WHERE SubAssetClassID = @SubAssetClassID 
-					   And [SerialNumber] LIKE @prefix + '%' 
-					   order by AssetID desc);
+		           FROM [ArmsV2].[dbo].[Asset.Tag] 
+			   WHERE SubAssetClassID = @SubAssetClassID 
+			   And [SerialNumber] LIKE @prefix + '%' 
+			   order by AssetID desc);
 
 	IF (@lastserial IS NULL)
 		BEGIN
