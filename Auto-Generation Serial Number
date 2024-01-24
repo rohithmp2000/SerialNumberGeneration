@@ -1,0 +1,26 @@
+--SET @SerialNumber
+--BEGIN
+	DECLARE @prefix VARCHAR(5),
+			@lastserial varchar(10);
+
+	SET @prefix = (select AssetSubClassAbbrev 
+				   FROM [Asset.SubClass] 
+				   WHERE ID = @SubAssetClassID);
+	SET @lastserial = (SELECT top 1 [SerialNumber] 
+				       FROM [ArmsV2].[dbo].[Asset.Tag] 
+					   WHERE SubAssetClassID = @SubAssetClassID 
+					   And [SerialNumber] LIKE @prefix + '%' 
+					   order by AssetID desc);
+
+	IF (@lastserial IS NULL)
+		BEGIN
+			SET @SerialNumber = @prefix + REPLICATE('0',4) + '1';
+		END
+	ELSE
+		BEGIN
+			DECLARE @numericPart NVARCHAR(50) = SUBSTRING(@lastSerial, LEN(@prefix) + 1, LEN(@lastSerial));
+			DECLARE @numericValue INT = CAST(@numericPart AS INT) + 1;
+
+			SET @SerialNumber = @prefix + RIGHT('00000' + CAST(@numericValue AS NVARCHAR(5)), 5);
+		END
+--END
